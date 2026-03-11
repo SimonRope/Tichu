@@ -1,0 +1,7 @@
+.bamboo-box {
+    border: 12px solid transparent;
+    padding: 20px;
+    background: none;
+
+    border-image: url("/bamboo-border.png") 30 round;
+}

@@ -1,0 +1,12 @@
+@import url('https://fonts.cdnfonts.com/css/bonzai');
+
+body {
+  margin: 0;
+  min-height: 100vh;
+    
+  background: radial-gradient(circle,
+    rgba(237, 221, 83, 1) 0%,
+    rgb(200, 180, 44) 60%,
+    rgba(149, 127, 2, 1) 100%);
+  font-family: 'Bonzai', sans-serif;
+}
