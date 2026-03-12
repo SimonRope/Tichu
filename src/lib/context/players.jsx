@@ -4,13 +4,6 @@ import { Query } from "appwrite";
 
 export async function addPlayer(username, alias ) {
   try {
-    console.log(
-      await tablesDB.listRows({
-        databaseId: import.meta.env.VITE_APPWRITE_DB_ID,
-        tableId: import.meta.env.VITE_APPWRITE_TABLE_PLAYERS,
-        queries: [Query.equal("alias", "Simon")],
-      }),
-    );
     const response = await tablesDB.createRow({
       databaseId: import.meta.env.VITE_APPWRITE_DB_ID,
       tableId: import.meta.env.VITE_APPWRITE_TABLE_PLAYERS,
@@ -20,6 +13,6 @@ export async function addPlayer(username, alias ) {
 
     return response;
   } catch (err) {
-    console.error("Fehler beim Hinzufügen:", err);
+    throw err
   }
 }
