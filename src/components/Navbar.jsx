@@ -1,14 +1,19 @@
-import React from 'react'
+import React from "react";
+import { NavLink } from "react-router-dom";
+import "./Navbar.css";
 
 function Navbar() {
   return (
-    <nav>
-      <a href="/">Idea tracker</a>
-      <div>
-        test
-      </div>
+    <nav className="navbar">
+      <NavLink to="/" end>
+        Neues Spiel
+      </NavLink>
+
+      <NavLink to="/addNewPlayer" end>
+        Neuen Spieler erstellen
+      </NavLink>
     </nav>
-  )
+  );
 }
 
-export default Navbar
+export default Navbar;

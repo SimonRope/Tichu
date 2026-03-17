@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { addPlayer } from "../lib/context/players";
-
+import Navbar from "../components/Navbar";
+import BambooBox from "../components/BambooBox";
 
 function AddNewPlayer() {
   const [username, setUsername] = useState("");
@@ -8,7 +9,10 @@ function AddNewPlayer() {
 
   async function handleSubmit(e) {
     e.preventDefault(); // Page Reload verhindern
-    if (!username) return;
+    if (!username || !alias) {
+      alert("Bitte beide Felder ausfüllen");
+      return;
+    }
 
     try {
       await addPlayer(username, alias);
@@ -19,7 +23,7 @@ function AddNewPlayer() {
         alert("Username existiert bereits");
       } else {
         alert("Fehler beim Erstellen des Spielers");
-        console.error(error);
+        console.error(err);
         setAlias("");
       }
     }
@@ -27,7 +31,8 @@ function AddNewPlayer() {
   }
 
   return (
-    <div>
+    <BambooBox>
+      <Navbar />
       <h2>Neuen Spieler erstellen</h2>
       <form onSubmit={handleSubmit}>
         <input
@@ -42,7 +47,7 @@ function AddNewPlayer() {
         />
         <button type="submit">Add Player</button>
       </form>
-    </div>
+    </BambooBox>
   );
 }
 

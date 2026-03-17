@@ -1,0 +1,22 @@
+.teamHead {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.teamHead span:last-child {
+    text-align: right;
+}
+
+ .teamData {
+     display: grid;
+     grid-template-columns: 1fr 1fr 1fr;
+     align-items: center;
+     justify-items: center;
+     width: 100%;
+     min-height: 24px;
+ }
+
+ .scoreData{
+    display: flex;
+    justify-content: center;
+ }
