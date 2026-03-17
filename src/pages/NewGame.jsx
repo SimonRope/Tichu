@@ -87,11 +87,7 @@ function NewGame() {
       const teamADoc = await getTeamDoc(teamA.map((p) => p.$id));
       const teamBDoc = await getTeamDoc(teamB.map((p) => p.$id));
 
-      console.log("test");
-
       const gameDoc = await createGame([teamADoc.$id, teamBDoc.$id]);
-
-      console.log("test2");
 
       startGame(gameDoc.$id);
 

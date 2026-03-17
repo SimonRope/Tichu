@@ -17,7 +17,8 @@ const TICHU_POINTS_MAP = {
   gtlose: -200,
 };
 
-export async function addNewRound(gameId, teams, players, roundData, points) {
+export async function addNewRound(gameDoc, teams, players, roundData, points) {
+  const gameId = gameDoc.$id;
   let response = await tablesDB.createRow({
     databaseId: import.meta.env.VITE_APPWRITE_DB_ID,
     tableId: import.meta.env.VITE_APPWRITE_TABLE_ROUND,
@@ -27,7 +28,6 @@ export async function addNewRound(gameId, teams, players, roundData, points) {
     },
   });
 
-  console.log(response);
   const roundId = response.$id;
 
   const playerData = await Promise.all(
@@ -63,10 +63,14 @@ export async function addNewRound(gameId, teams, players, roundData, points) {
     teams.map((team) => {
       const cardPoints =
         team === teams[0] ? Number(points[0]) : Number(points[1]);
+
+      //gesamt score des teams in dieser runde berechnen
       let teamScore = cardPoints;
 
-      const double_win = teamScore === 200;
+      //doppel sieg, genau dann wenn 200 kartenpunkte
+      const double_win = cardPoints === 200;
 
+      //ansagen und mahjong wunsch daten pro spieler addieren
       team.teamPlayers.forEach((teamPlayer) => {
         const playerData = roundData[teamPlayer.player.$id];
 
@@ -76,7 +80,7 @@ export async function addNewRound(gameId, teams, players, roundData, points) {
         }
       });
 
-      console.log(teamScore);
+      // die row in der tabelle Round_Score erstellen
       return tablesDB.createRow({
         databaseId: import.meta.env.VITE_APPWRITE_DB_ID,
         tableId: import.meta.env.VITE_APPWRITE_TABLE_ROUND_SCORE,
@@ -92,6 +96,26 @@ export async function addNewRound(gameId, teams, players, roundData, points) {
     }),
   );
 
+  //Game Teams einträge mit dem neuen total score updaten
+  await Promise.all(
+    roundScores.map(async (roundScore) => {
+      const teamId = roundScore.team.$id;
+
+      const gameTeam = gameDoc.gameTeams.find(
+        (gameTeam) => gameTeam.team === teamId,
+      );
+
+      const newTotalScore = (gameTeam.total_score || 0) + roundScore.score;
+
+      return await tablesDB.updateRow({
+        databaseId: import.meta.env.VITE_APPWRITE_DB_ID,
+        tableId: import.meta.env.VITE_APPWRITE_TABLE_GAME_TEAM,
+        rowId: gameTeam.$id,
+        data: { total_score: newTotalScore },
+      });
+    }),
+  );
+
   response.playerRounds = playerData
     .map((playerRound) =>
       playerRound ? { ...playerRound, player: playerRound.player.$id } : null,
@@ -102,8 +126,6 @@ export async function addNewRound(gameId, teams, players, roundData, points) {
     ...roundScore,
     team: roundScore.team.$id,
   }));
-
-  console.log(response);
 
   return response;
 }

@@ -36,6 +36,7 @@ export async function getGameRow(gameId) {
     queries: [
       Query.select([
         "gameTeams.team",
+        "gameTeams.total_score",
 
         "rounds.playerRounds.announcement",
         "rounds.playerRounds.success",

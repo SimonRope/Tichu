@@ -53,11 +53,18 @@ const isDoubleWin = (team, roundScores) => {
   return roundScores[1]?.is_double_win;
 };
 
-const getScore = (team, roundScores) => {
+const getRoundScore = (team, roundScores) => {
   if (team?.$id === roundScores[0]?.team) {
     return roundScores[0].score;
   }
   return roundScores[1]?.score;
+};
+
+const getTotalScore = (team, gameDoc) => {
+  if (team?.$id === gameDoc?.gameTeams[0]?.team) {
+    return gameDoc?.gameTeams[0]?.total_score;
+  }
+  return gameDoc?.gameTeams[1]?.total_score;
 };
 
 function ScoreTable({ gameDoc, teams }) {
@@ -68,7 +75,10 @@ function ScoreTable({ gameDoc, teams }) {
           <th>
             <TeamHeader team={teams[0]} />
           </th>
-          <th>Stand</th>
+          <th>
+            {getTotalScore(teams[0], gameDoc)} :{" "}
+            {getTotalScore(teams[1], gameDoc)}
+          </th>
           <th>
             <TeamHeader team={teams[1]} />
           </th>
@@ -84,8 +94,8 @@ function ScoreTable({ gameDoc, teams }) {
             <td>
               <div className="scoreData">
                 <span>
-                  {getScore(teams[0], round?.roundScores)} :{" "}
-                  {getScore(teams[1], round?.roundScores)}{" "}
+                  {getRoundScore(teams[0], round?.roundScores)} :{" "}
+                  {getRoundScore(teams[1], round?.roundScores)}{" "}
                 </span>
               </div>
             </td>

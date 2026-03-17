@@ -50,7 +50,7 @@ const TichuSelect = ({ playerId, roundData, updatePlayer }) => {
 };
 
 //popup fenster für die eingabe einer neuen runde
-function RoundModal({ gameId, teams, onClose, onSave }) {
+function RoundModal({ gameDoc, teams, onClose, onSave }) {
   const [points, setPoints] = useState(["50", "50"]);
   const [players, setPlayers] = useState([]);
 
@@ -70,7 +70,7 @@ function RoundModal({ gameId, teams, onClose, onSave }) {
       };
     });
     setRoundData(initialRoundData);
-  }, [gameId]);
+  }, []);
 
   function updatePlayer(playerId, field, value) {
     setRoundData((prev) => ({
@@ -112,7 +112,7 @@ function RoundModal({ gameId, teams, onClose, onSave }) {
 
   async function handleSave() {
     const newRound = await addNewRound(
-      gameId,
+      gameDoc,
       teams,
       players,
       roundData,

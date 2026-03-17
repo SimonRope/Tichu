@@ -9,6 +9,7 @@ import BambooBox from "../components/BambooBox";
 
 function Game() {
   const { gameId } = useParams();
+  const [invalidGameId, setInvalidGameId] = useState(false);
   const [gameDoc, setGameDoc] = useState(null);
   const [teams, setTeams] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -19,7 +20,17 @@ function Game() {
     }
 
     async function loadData() {
-      const gameRow = await getGameRow(gameId);
+      const gameRow = await getGameRow(gameId).catch((error) => {
+        if (error.code === 404) {
+          setInvalidGameId(true);
+        } else {
+          console.error(error);
+        }
+        return null;
+      });
+
+      if (gameRow === null) return;
+
       setGameDoc(gameRow);
 
       const teamRows = await Promise.all(
@@ -31,15 +42,41 @@ function Game() {
     loadData();
   }, [gameId]);
 
-  const handleNewRound = (newRound) => {
+  const updateGameDoc = (newRound) => {
     setGameDoc((prev) => ({
       ...prev,
+      //Update Rounds
       rounds: [...(prev.rounds || []), newRound],
+      //update total score in game teams
+      gameTeams: prev.gameTeams.map((gameTeam) => ({
+        ...gameTeam,
+        total_score:
+          gameTeam.total_score +
+          newRound.roundScores.find(
+            (roundScore) => roundScore.team === gameTeam.team,
+          ).score,
+      })),
     }));
   };
 
+  if (invalidGameId) {
+    return (
+      <BambooBox>
+        <Navbar />
+        <br></br>
+        <h2>Spiel ID existiert nicht</h2>
+      </BambooBox>
+    );
+  }
+
   if (!gameDoc) {
-    return <div>Loading...</div>;
+    return (
+      <BambooBox>
+        <Navbar />
+        <br></br>
+        <h2>Loading Game...</h2>
+      </BambooBox>
+    );
   }
 
   return (
@@ -56,9 +93,9 @@ function Game() {
       {showModal && (
         <RoundModal
           onClose={() => setShowModal(false)}
-          onSave={handleNewRound}
+          onSave={updateGameDoc}
           teams={teams}
-          gameId={gameId}
+          gameDoc={gameDoc}
         />
       )}
       <ScoreTable gameDoc={gameDoc} teams={teams} />
