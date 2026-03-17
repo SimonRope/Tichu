@@ -5,6 +5,7 @@ import { getGameRow } from "../lib/context/game";
 import { getTeamRow } from "../lib/context/team";
 import RoundModal from "../components/RoundModal";
 import ScoreTable from "../components/ScoreTable";
+import BambooBox from "../components/BambooBox";
 
 function Game() {
   const { gameId } = useParams();
@@ -13,6 +14,10 @@ function Game() {
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
+    if (gameId) {
+      localStorage.setItem("lastGameId", gameId);
+    }
+
     async function loadData() {
       const gameRow = await getGameRow(gameId);
       setGameDoc(gameRow);
@@ -39,9 +44,8 @@ function Game() {
   }
 
   return (
-    <div>
+    <BambooBox>
       <Navbar />
-      Game: {gameId}
       <br></br>
       <button
         onClick={() => {
@@ -59,7 +63,7 @@ function Game() {
         />
       )}
       <ScoreTable gameDoc={gameDoc} teams={teams} />
-    </div>
+    </BambooBox>
   );
 }
 

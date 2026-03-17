@@ -1,17 +1,41 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import "./Navbar.css";
 
 function Navbar() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const lastGameId = localStorage.getItem("lastGameId");
+
+  const goToLastGame = () => {
+    if (lastGameId) {
+      navigate(`/game/${lastGameId}`);
+    }
+  };
+
   return (
     <nav className="navbar">
-      <NavLink to="/" end>
-        Neues Spiel
-      </NavLink>
+      <button
+        onClick={() => {
+          sessionStorage.setItem("didRedirect", "true");
+          navigate("/");
+        }}
+      >
+        Home
+      </button>
 
-      <NavLink to="/addNewPlayer" end>
+      <button onClick={() => navigate("/newGame")}>Neues Spiel</button>
+
+      <button onClick={() => navigate("/addNewPlayer")}>
         Neuen Spieler erstellen
-      </NavLink>
+      </button>
+
+      {
+        //button nur anzeigen, wenn es ein letztes spiel gibt und man gerade nicht in einem spiel ist.
+        lastGameId && !location.pathname.startsWith("/game/") && (
+          <button onClick={goToLastGame}>Letztes Spiel</button>
+        )
+      }
     </nav>
   );
 }
