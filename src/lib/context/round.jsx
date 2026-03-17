@@ -98,7 +98,10 @@ export async function addNewRound(gameId, teams, players, roundData, points) {
     )
     .filter(Boolean);
 
-  response.roundScores = roundScores;
+  response.roundScores = roundScores.map((roundScore) => ({
+    ...roundScore,
+    team: roundScore.team.$id,
+  }));
 
   console.log(response);
 

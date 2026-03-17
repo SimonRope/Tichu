@@ -21,7 +21,6 @@ function Game() {
     async function loadData() {
       const gameRow = await getGameRow(gameId);
       setGameDoc(gameRow);
-      console.log(gameRow);
 
       const teamRows = await Promise.all(
         gameRow.gameTeams.map((gameTeam) => getTeamRow(gameTeam.team)),

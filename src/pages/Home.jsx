@@ -7,13 +7,12 @@ function Home() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("useEffect triggert");
     const lastGameId = localStorage.getItem("lastGameId");
 
     const alreadyRedirected = sessionStorage.getItem("didRedirect");
 
     if (lastGameId && !alreadyRedirected) {
-        //wenn man auf der Home site startet, wird man automatisch weiter zum letzten spiel geleitet
+      //wenn man auf der Home site startet, wird man automatisch weiter zum letzten spiel geleitet
       sessionStorage.setItem("didRedirect", "true");
       navigate(`/game/${lastGameId}`);
     }
