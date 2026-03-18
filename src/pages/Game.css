@@ -1,0 +1,10 @@
+.roundButtons {
+    display: flex;
+    gap: 10px;
+    /* Abstand zwischen Buttons */
+}
+
+.roundButtons button {
+    flex: 1;
+    /* beide Buttons gleich breit */
+}

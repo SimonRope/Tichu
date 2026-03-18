@@ -97,24 +97,7 @@ export async function addNewRound(gameDoc, teams, players, roundData, points) {
   );
 
   //Game Teams einträge mit dem neuen total score updaten
-  await Promise.all(
-    roundScores.map(async (roundScore) => {
-      const teamId = roundScore.team.$id;
-
-      const gameTeam = gameDoc.gameTeams.find(
-        (gameTeam) => gameTeam.team === teamId,
-      );
-
-      const newTotalScore = (gameTeam.total_score || 0) + roundScore.score;
-
-      return await tablesDB.updateRow({
-        databaseId: import.meta.env.VITE_APPWRITE_DB_ID,
-        tableId: import.meta.env.VITE_APPWRITE_TABLE_GAME_TEAM,
-        rowId: gameTeam.$id,
-        data: { total_score: newTotalScore },
-      });
-    }),
-  );
+  await updateTotalScore(roundScores, gameDoc, true);
 
   response.playerRounds = playerData
     .map((playerRound) =>
@@ -128,4 +111,40 @@ export async function addNewRound(gameDoc, teams, players, roundData, points) {
   }));
 
   return response;
+}
+
+async function updateTotalScore(roundScores, gameDoc, addScore) {
+  await Promise.all(
+    roundScores.map(async (roundScore) => {
+      const teamId =
+        typeof roundScore.team === "string"
+          ? roundScore.team
+          : roundScore.team?.$id;
+
+      const gameTeam = gameDoc.gameTeams.find(
+        (gameTeam) => gameTeam.team === teamId,
+      );
+
+      const newTotalScore =
+        (gameTeam.total_score || 0) +
+        (addScore ? roundScore.score : -roundScore.score);
+
+      return await tablesDB.updateRow({
+        databaseId: import.meta.env.VITE_APPWRITE_DB_ID,
+        tableId: import.meta.env.VITE_APPWRITE_TABLE_GAME_TEAM,
+        rowId: gameTeam.$id,
+        data: { total_score: newTotalScore },
+      });
+    }),
+  );
+}
+
+export async function deleteRound(round, gameDoc) {
+  await tablesDB.deleteRow({
+    databaseId: import.meta.env.VITE_APPWRITE_DB_ID,
+    tableId: import.meta.env.VITE_APPWRITE_TABLE_ROUND,
+    rowId: round.$id,
+  });
+
+  await updateTotalScore(round.roundScores, gameDoc, false);
 }

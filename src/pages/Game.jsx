@@ -6,6 +6,8 @@ import { getTeamRow } from "../lib/context/team";
 import RoundModal from "../components/RoundModal";
 import ScoreTable from "../components/ScoreTable";
 import BambooBox from "../components/BambooBox";
+import "./Game.css";
+import { deleteRound } from "../lib/context/round";
 
 function Game() {
   const { gameId } = useParams();
@@ -59,6 +61,36 @@ function Game() {
     }));
   };
 
+  const deleteLastRound = async () => {
+    let rounds = gameDoc.rounds;
+    if (rounds.length === 0) return;
+
+    const confirmed = window.confirm(
+      "Willst du die letzte Runde wirklich löschen?",
+    );
+
+    if (!confirmed) return;
+
+    const lastRound = rounds[rounds.length - 1];
+
+    await deleteRound(lastRound, gameDoc);
+
+    rounds.pop();
+
+    setGameDoc({
+      ...gameDoc,
+      rounds: rounds,
+      gameTeams: gameDoc.gameTeams.map((gameTeam) => ({
+        ...gameTeam,
+        total_score:
+          gameTeam.total_score -
+          lastRound.roundScores.find(
+            (roundScore) => roundScore.team === gameTeam.team,
+          ).score,
+      })),
+    });
+  };
+
   if (invalidGameId) {
     return (
       <BambooBox>
@@ -83,13 +115,6 @@ function Game() {
     <BambooBox>
       <Navbar />
       <br></br>
-      <button
-        onClick={() => {
-          setShowModal(true);
-        }}
-      >
-        Neue Runde
-      </button>
       {showModal && (
         <RoundModal
           onClose={() => setShowModal(false)}
@@ -99,6 +124,17 @@ function Game() {
         />
       )}
       <ScoreTable gameDoc={gameDoc} teams={teams} />
+      <br></br>
+      <div className="roundButtons">
+        <button
+          onClick={() => {
+            setShowModal(true);
+          }}
+        >
+          Neue Runde
+        </button>
+        <button onClick={deleteLastRound}>Letzte Runde löschen</button>
+      </div>
     </BambooBox>
   );
 }
